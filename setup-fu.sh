@@ -12,7 +12,7 @@ ruby_version_string="1.9.2p180"
 script_runner=$(whoami)
 setupfu_path=$(cd && pwd)/setup-fu
 log_file="$setupfu_path/install.log"
-templates_location="https://github.com/tmilewski/setup-fu/raw/master/templates/"
+templates_location="https://github.com/tmilewski/setup-fu/raw/master/templates"
 
 control_c()
 {
@@ -56,6 +56,11 @@ echo -e "\n"
 echo "Please enter a port for SSH: "
 read ssh_port
 
+## CREATE INSTALL DIR
+echo -e "\n=> Creating install dir..."
+cd && mkdir -p $setupfu_path/src && cd $setupfu_path && touch $setupfu_path/install.log
+echo "==> done..."
+
 ## ADD NEW GROUP
 echo "\n=> Adding $group group..."
 #passwd
@@ -83,16 +88,16 @@ echo "==> done..."
 ## CONFIGURE SSHD
 echo "\n=> Configuring sshd..."
 wget --no-check-certificate -O /etc/ssh/sshd_config $templates_location/sshd/sshd_config
-sed -e "s/^Port .*$/Port: $ssh_port/" \
-		-e "s/^AllowUsers: .*$/AllowUsers: $user/" \
-		/etc/ssh/sshd_config
+sed -i -e "s/^Port .*$/Port: $ssh_port/" \
+			 -e "s/^AllowUsers: .*$/AllowUsers: $user/" \
+			/etc/ssh/sshd_config
 echo "==> done..."
 
 ## CONFIGURE IPTABLES
 echo "\n=> Configuring iptables..."
 /sbin/iptables -F
 wget --no-check-certificate -O /etc/iptables.up.rules $templates_location/iptables/iptables.up.rules
-sed "s/-A INPUT -p tcp -m state --state NEW --dport 30000 -j ACCEPT$/-A INPUT -p tcp -m state --state NEW --dport $ssh_port -j ACCEPT/" /etc/iptables.up.rules
+sed -i "s/-A INPUT -p tcp -m state --state NEW --dport 30000 -j ACCEPT$/-A INPUT -p tcp -m state --state NEW --dport $ssh_port -j ACCEPT/" /etc/iptables.up.rules
 /sbin/iptables-restore < /etc/iptables.up.rules
 wget --no-check-certificate -O /etc/network/if-pre-up.d/iptables $templates_location/iptables/iptables
 chmod +x /etc/network/if-pre-up.d/iptables
@@ -115,12 +120,6 @@ fi
 sudo -v >/dev/null 2>&1 || { echo $script_runner has no sudo privileges ; exit 1; }
 
 echo -e "\n\n!!! Set to install RVM for user: $script_runner !!! \n"
-
-## CREATE INSTALL DIR
-echo -e "\n=> Creating install dir..."
-cd && mkdir -p setup-fu/src && cd setup-fu && touch install.log
-echo "==> done..."
-
 
 ## ENSURE .BASHRC AND .BASH_PROFILE EXIST
 echo -e "\n=> Ensuring there is a .bashrc and .bash_profile..."
@@ -178,9 +177,9 @@ if [ $install_postfix == "Y" ] ; then
 	echo -e "\n=> Install postfix..."
 	sudo $pm -y install postfix >> $log_file 2>&1
 	
-	sed '/# Allow Postfix/ a\' \
-			'-I INPUT -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT\' \
-			'-I OUTPUT -p tcp --sport 25 -m state --state NEW,ESTABLISHED -j ACCEPT'
+	sed -i '/# Allow Postfix/ a\' \
+				 '-I INPUT -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT\' \
+				 '-I OUTPUT -p tcp --sport 25 -m state --state NEW,ESTABLISHED -j ACCEPT'
 			
 	# TODO: Configuration
 			

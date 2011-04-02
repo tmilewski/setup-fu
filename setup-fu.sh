@@ -10,9 +10,9 @@ locale="en_US.UTF-8"
 ruby_version="1.9.2"
 ruby_version_string="1.9.2p180"
 script_runner=$(whoami)
-railsready_path=$(cd && pwd)/railsready
-log_file="$railsready_path/install.log"
-templates_location="https://github.com/tmilewski/setup-fu/raw/master/templates"
+setupfu_path=$(cd && pwd)/setup-fu
+log_file="$setupfu_path/install.log"
+templates_location="https://github.com/tmilewski/setup-fu/raw/master/templates/"
 
 control_c()
 {
@@ -118,7 +118,7 @@ echo -e "\n\n!!! Set to install RVM for user: $script_runner !!! \n"
 
 ## CREATE INSTALL DIR
 echo -e "\n=> Creating install dir..."
-cd && mkdir -p railsready/src && cd railsready && touch install.log
+cd && mkdir -p setup-fu/src && cd setup-fu && touch install.log
 echo "==> done..."
 
 

@@ -112,8 +112,15 @@ echo "==> done..."
 
 ## CHECK AND DISALLOW IF USER IS ROOT
 if [ $script_runner == "root" ] ; then
-  echo -e "\nThis script must be run as a normal user with sudo privileges\n"
-  exit 1
+  echo -e "\nThis script must be run as a normal user with sudo privileges. Attempting to switch to $user.\n"
+	su $user
+
+	if [ $(whoami) -ne $user ] ; then
+		echo -e "\n Couldn't switch users. Exiting.\n"
+		exit 1
+	else
+		$script_runner = $user
+	fi
 fi
 
 # CHECK IF USER HAS SUDO PRIVILEGES

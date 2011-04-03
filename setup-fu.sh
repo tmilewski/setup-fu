@@ -88,8 +88,8 @@ echo "==> done..."
 ## CONFIGURE SSHD
 echo "\n=> Configuring sshd..."
 wget --no-check-certificate -O /etc/ssh/sshd_config $templates_location/sshd/sshd_config
-sed -i -e "s/^Port .*$/Port: $ssh_port/" \
-			 -e "s/^AllowUsers: .*$/AllowUsers: $user/" \
+sed -i -e "s/^Port .*$/Port $ssh_port/" \
+			 -e "s/^AllowUsers: .*$/AllowUsers $user/" \
 			/etc/ssh/sshd_config
 echo "==> done..."
 

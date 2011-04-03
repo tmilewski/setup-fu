@@ -62,7 +62,7 @@ cd && mkdir -p $setupfu_path/src && cd $setupfu_path && touch $setupfu_path/inst
 echo "==> done..."
 
 ## ADD NEW GROUP
-echo "\n=> Adding $group group..."
+echo -e "\n=> Adding $group group..."
 #passwd
 /usr/sbin/groupadd $group
 echo "%$group  ALL=(ALL)       ALL" >> "/usr/sbin/visudo"
@@ -70,13 +70,13 @@ echo "%$group  ALL=(ALL)       ALL" >> "/usr/sbin/visudo"
 echo "==> done..."
 
 ## ADD NEW USER
-echo "\n=> Adding $user user..."
+echo -e "\n=> Adding $user user..."
 /usr/sbin/adduser $user
 /usr/sbin/usermod -a -G $group $user
 echo "==> done..."
 
 ## SSH KEYS
-echo "\n=> Installing SSH keys..."
+echo -e "\n=> Installing SSH keys..."
 mkdir /home/$user/.ssh
 touch /home/$user/.ssh/authorized_keys
 echo "$public_key" >> "/home/$user/.ssh/authorized_keys"
@@ -86,7 +86,7 @@ chmod 600 /home/$user/.ssh/authorized_keys
 echo "==> done..."
 
 ## CONFIGURE SSHD
-echo "\n=> Configuring sshd..."
+echo -e "\n=> Configuring sshd..."
 wget --no-check-certificate -O /etc/ssh/sshd_config $templates_location/sshd/sshd_config
 sed -i -e "s/^Port .*$/Port $ssh_port/" \
 			 -e "s/^AllowUsers: .*$/AllowUsers $user/" \
@@ -94,7 +94,7 @@ sed -i -e "s/^Port .*$/Port $ssh_port/" \
 echo "==> done..."
 
 ## CONFIGURE IPTABLES
-echo "\n=> Configuring iptables..."
+echo -e "\n=> Configuring iptables..."
 /sbin/iptables -F
 wget --no-check-certificate -O /etc/iptables.up.rules $templates_location/iptables/iptables.up.rules
 sed -i "s/-A INPUT -p tcp -m state --state NEW --dport 30000 -j ACCEPT$/-A INPUT -p tcp -m state --state NEW --dport $ssh_port -j ACCEPT/" /etc/iptables.up.rules
@@ -120,6 +120,7 @@ if [ $script_runner == "root" ] ; then
 		exit 1
 	else
 		$script_runner = $user
+		echo -e "\n New Script Runner: $script_runner\n"
 	fi
 fi
 

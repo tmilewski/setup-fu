@@ -7,6 +7,7 @@ user="deploy"
 group="wheel"
 locale="en_US.UTF-8"
 setupfu_path=$(cd && pwd)/setup-fu
+local_path="/home/$user/setup-fu"
 log_file="$setupfu_path/install.log"
 repository="https://github.com/tmilewski/setup-fu/raw/master"
 templates_location="$repository/templates"
@@ -47,8 +48,8 @@ echo "==> done..."
 echo -e "\n=> Adding $group group..."
 #passwd
 /usr/sbin/groupadd $group
-echo "%$group  ALL=(ALL)       ALL" >> "/usr/sbin/visudo"
-#set rebinddelete
+echo "%$group  ALL=(ALL)       ALL" >> "/etc/sudoers"
+set rebinddelete
 echo "==> done..."
 
 ## ADD NEW USER
@@ -92,6 +93,11 @@ sudo /usr/sbin/locale-gen $locale
 sudo /usr/sbin/update-locale LANG=$locale
 echo "==> done..."
 
+## CREATE LOCAL INSTALL DIR
+echo -e "\n=> Creating local install dir..."
+cd && mkdir -p $local_path/src && cd $local_path && touch $setupfu_path/install.log
+echo "==> done..."
+
 ## RUN THE REST OF THE SETUP AS A NORMAL USER
 echo -e "\n=> Running the rest of the setup as $user\n"
-wget --no-check-certificate -O $setupfu_path/src/installer.sh $repository/installer.sh && cd $setupfu_path/src && su - $user -c bash installer.sh $log_file
+wget --no-check-certificate -O $local_path/src/installer.sh $repository/installer.sh && cd $local_path/src && su - $user -c "bash installer.sh $log_file"
